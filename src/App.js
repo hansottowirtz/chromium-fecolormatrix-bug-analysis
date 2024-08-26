@@ -51,12 +51,37 @@ function App() {
           href="https://issues.chromium.org/issues/41483538"
         >
           Chromium bug #41483538
+        </a>{" "}
+        /{" "}
+        <a
+          target="_blank"
+          rel="noreferrer"
+          href="https://issues.skia.org/issues/362116527"
+        >
+          Skia bug #362116527
         </a>
         .
       </div>
       <div style={{ margin: 10 }}>
-        Summary: Chromium has a bug where SVG feColorMatrix filters are wrongly
-        rendered on Display P3 screens.
+        <a
+          target="_blank"
+          rel="noreferrer"
+          href="https://github.com/hansottowirtz/chromium-fecolormatrix-bug-analysis"
+        >
+          Github
+        </a>
+        {" | "}
+        <a
+          target="_blank"
+          rel="noreferrer"
+          href="https://fiddle.skia.org/c/f03d57e1fd43c6cfcca416713527d43d"
+        >
+          Skia fiddle
+        </a>
+      </div>
+      <div style={{ margin: 10 }}>
+        Summary: Chromium/Skia has a bug where SVG feColorMatrix filters are
+        wrongly rendered on Display P3 screens.
       </div>
       <div style={{ margin: 10 }}>
         <DetectBug />
@@ -255,6 +280,30 @@ echo "data:image/avif;base64,$base64var"
           regardless of the screen.
         </div>
       </div>
+      <div
+        style={{
+          margin: 10,
+          paddingBottom: 10,
+          borderBottom: "1px lightgray solid",
+        }}
+      >
+        <div>
+          This bug is reproducible in Skia (Chrome's rendering engine). See this{" "}
+          <a
+            target="_blank"
+            rel="noreferrer"
+            href="https://fiddle.skia.org/c/f03d57e1fd43c6cfcca416713527d43d"
+          >
+            Skia fiddle
+          </a>
+          .
+        </div>
+        <img
+          loading="lazy"
+          alt="Skia fiddle"
+          src="https://fiddle.skia.org/i/f03d57e1fd43c6cfcca416713527d43d_raster.png"
+        />
+      </div>
     </div>
   );
 }
@@ -326,7 +375,6 @@ function DrawToCanvas({ children, colorSpace }) {
       return;
     }
     const ctx = canvas.getContext("2d", { colorSpace });
-    ctx.scale(scale, scale);
     if (!ctx) {
       return;
     }
@@ -334,7 +382,7 @@ function DrawToCanvas({ children, colorSpace }) {
     const img = new Image();
     img.src = "data:image/svg+xml," + encodeURIComponent(svg);
     img.onload = () => {
-      ctx.drawImage(img, 0, 0);
+      ctx.drawImage(img, 0, 0, size, size, 0, 0, size * scale, size * scale);
     };
   }, [canvas, colorSpace, contentDiv, scale]);
 
