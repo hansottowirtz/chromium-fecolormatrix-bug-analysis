@@ -60,6 +60,7 @@ function App() {
       </div>
       <div style={{ margin: 10 }}>
         <DetectBug />
+        <DetectP3Screen />
       </div>
       <div
         style={{
@@ -300,6 +301,7 @@ function DetectBug() {
   return (
     <div
       style={{
+        margin: "10px 0",
         padding: 16,
         background:
           hasBug === null ? "lightgray" : hasBug ? "lightgreen" : "lightcoral",
@@ -336,7 +338,6 @@ function DrawToCanvas({ children, colorSpace }) {
     };
   }, [canvas, colorSpace, contentDiv, scale]);
 
-
   return (
     <div>
       <div style={{ display: "none" }} ref={setContentDiv}>
@@ -366,6 +367,37 @@ function ToggleDiv({ children }) {
         {visible ? "Hide SVG" : "Show SVG"}
       </button>
       <div>{visible && children}</div>
+    </div>
+  );
+}
+
+function DetectP3Screen() {
+  const [isP3, setIsP3] = useState(null);
+
+  useEffect(() => {
+    if (CSS.supports("color", "color(display-p3 1 1 1)")) {
+      let media = window.matchMedia("(color-gamut:p3)");
+      setIsP3(media.matches);
+      const fn = () => {
+        setIsP3(media.matches);
+      };
+      media.addEventListener("change", fn);
+      return () => media.removeEventListener("change", fn);
+    }
+  }, []);
+
+  return (
+    <div
+      style={{
+        margin: "10px 0",
+        padding: 16,
+        background:
+          isP3 === null ? "lightgray" : isP3 ? "lightgreen" : "lightcoral",
+      }}
+    >
+      Does your current screen support Display P3?
+      <br />
+      {isP3 ? "Yes" : "No"}
     </div>
   );
 }
