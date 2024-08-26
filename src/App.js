@@ -1,5 +1,5 @@
 import "./App.css";
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { detectChromeFeColorMatrixBug } from "./detect-chrome-fecolormatrix-bug";
 
 const AVIF_1X1_HDR_BASE64 =
@@ -45,7 +45,11 @@ function App() {
     <div className="App" style={{ margin: 8 }}>
       <div style={{ margin: 10 }}>
         This is a small analysis of{" "}
-        <a target="_blank" href="https://issues.chromium.org/issues/41483538">
+        <a
+          target="_blank"
+          rel="noreferrer"
+          href="https://issues.chromium.org/issues/41483538"
+        >
           Chromium bug #41483538
         </a>
         .
@@ -204,7 +208,7 @@ base64var=$(cat 1x1-hdr.avif | base64)
 echo "data:image/avif;base64,$base64var"
 `}
         </CodeBlock>
-        <div>This way, we get the following 308-byte base64 image:</div>
+        <div>This way, we get the following 435-byte base64 image:</div>
         <CodeBlock>{AVIF_1X1_HDR_BASE64}</CodeBlock>
       </div>
       <div
@@ -228,7 +232,27 @@ echo "data:image/avif;base64,$base64var"
             <HdrPixel />
           </ProblematicSvg>
         </ToggleDiv>
-        <div>This SVG should now be yellow, regardless of screen and browser</div>
+        <div>
+          This SVG should now be yellow, regardless of screen and browser.
+        </div>
+      </div>
+      <div
+        style={{
+          margin: 10,
+          paddingBottom: 10,
+          borderBottom: "1px lightgray solid",
+        }}
+      >
+        <div>SVG with HDR pixel drawn to a P3 canvas</div>
+        <DrawToCanvas colorSpace={"display-p3"}>
+          <ProblematicSvg>
+            <HdrPixel />
+          </ProblematicSvg>
+        </DrawToCanvas>
+        <div>
+          Unfortunately, this will still look green on "buggy" Chromium,
+          regardless of the screen.
+        </div>
       </div>
     </div>
   );
@@ -240,7 +264,7 @@ function CodeBlock({ children }) {
   return (
     <div
       style={{
-        margin: 0,
+        margin: "8px 0",
         background: "lightgray",
         padding: 16,
         whiteSpace: "pre-wrap",
@@ -261,7 +285,7 @@ function Svg({ children }) {
       baseProfile="full"
       version="1.1"
       viewBox="0 0 200 200"
-      width="300"
+      width="200"
     >
       {children}
     </svg>
@@ -291,11 +315,16 @@ function DetectBug() {
 function DrawToCanvas({ children, colorSpace }) {
   const [contentDiv, setContentDiv] = useState(null);
   const [canvas, setCanvas] = useState(null);
+
+  const size = 200;
+  const scale = window.devicePixelRatio;
+
   useEffect(() => {
     if (!canvas || !contentDiv) {
       return;
     }
     const ctx = canvas.getContext("2d", { colorSpace });
+    ctx.scale(scale, scale);
     if (!ctx) {
       return;
     }
@@ -305,14 +334,23 @@ function DrawToCanvas({ children, colorSpace }) {
     img.onload = () => {
       ctx.drawImage(img, 0, 0);
     };
-  }, [canvas, colorSpace, contentDiv]);
+  }, [canvas, colorSpace, contentDiv, scale]);
+
 
   return (
     <div>
       <div style={{ display: "none" }} ref={setContentDiv}>
         {children}
       </div>
-      <canvas ref={setCanvas} width={300} height={300} style={{ width: 300 }} />
+      <canvas
+        ref={setCanvas}
+        width={Math.floor(size * scale)}
+        height={Math.floor(size * scale)}
+        style={{
+          width: size,
+          height: size,
+        }}
+      />
     </div>
   );
 }
@@ -325,7 +363,7 @@ function ToggleDiv({ children }) {
         Displaying the HDR pixel affects all SVGs on the page.
       </div>
       <button onClick={() => setVisible((v) => !v)}>
-        {visible ? "Hide" : "Show"}
+        {visible ? "Hide SVG" : "Show SVG"}
       </button>
       <div>{visible && children}</div>
     </div>
