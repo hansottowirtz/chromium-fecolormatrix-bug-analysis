@@ -51,14 +51,6 @@ function App() {
           href="https://issues.chromium.org/issues/41483538"
         >
           Chromium bug #41483538
-        </a>{" "}
-        /{" "}
-        <a
-          target="_blank"
-          rel="noreferrer"
-          href="https://issues.skia.org/issues/362116527"
-        >
-          Skia bug #362116527
         </a>
         .
       </div>
@@ -69,14 +61,6 @@ function App() {
           href="https://github.com/hansottowirtz/chromium-fecolormatrix-bug-analysis"
         >
           Github
-        </a>
-        {" | "}
-        <a
-          target="_blank"
-          rel="noreferrer"
-          href="https://fiddle.skia.org/c/f03d57e1fd43c6cfcca416713527d43d"
-        >
-          Skia fiddle
         </a>
       </div>
       <div style={{ margin: 10 }}>
@@ -288,7 +272,8 @@ echo "data:image/avif;base64,$base64var"
         }}
       >
         <div>
-          This bug is reproducible in Skia (Chrome's rendering engine). See this{" "}
+          This bug is also reproducible in Skia SVG, but Chrome doesn't use Skia
+          for SVG rendering. See this{" "}
           <a
             target="_blank"
             rel="noreferrer"
